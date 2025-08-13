@@ -1,0 +1,5 @@
+rasterio
+numpy
+tifffile
+pillow
+python-dotenv
