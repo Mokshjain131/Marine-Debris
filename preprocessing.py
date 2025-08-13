@@ -1,46 +1,42 @@
 import os
 import numpy as np
-from PIL import Image
 import tifffile as tiff
 from dotenv import load_dotenv
+from PIL import Image
+from scipy.ndimage import median_filter
 
-# Load variables from .env file
+# Load .env
 load_dotenv()
-
-# Get TIF path from environment variable
 INPUT_TIF = os.getenv("INPUT_TIF")
 
-# Output folder for CNN .npy
-CNN_TILES_DIR = "cnn_tiles"
-os.makedirs(CNN_TILES_DIR, exist_ok=True)
+# Read image
+image_array = tiff.imread(INPUT_TIF).astype(np.float32)
 
-# Output file paths
-OUTPUT_NPY = os.path.join(CNN_TILES_DIR, "output.npy")
-OUTPUT_PNG = "output.png"
+# Keep only first 10 bands (adjust if needed)
+image_array = image_array[:, :, :10]
 
-# Load the TIF image
-image_array = tiff.imread(INPUT_TIF)
-print(f"Loaded image shape: {image_array.shape}, dtype: {image_array.dtype}")
+# Clip extreme values to reduce sensor noise
+p_low, p_high = 1, 99  # percentiles
+for b in range(image_array.shape[2]):
+    low_val = np.percentile(image_array[:, :, b], p_low)
+    high_val = np.percentile(image_array[:, :, b], p_high)
+    image_array[:, :, b] = np.clip(image_array[:, :, b], low_val, high_val)
 
-# Save as .npy for CNN training
-np.save(OUTPUT_NPY, image_array)
-print(f"Saved NumPy array as {OUTPUT_NPY}")
+# Normalize each band to 0–1
+for b in range(image_array.shape[2]):
+    band = image_array[:, :, b]
+    band_min, band_max = band.min(), band.max()
+    image_array[:, :, b] = (band - band_min) / (band_max - band_min)
 
-# ----- Create PNG preview -----
-# If image has more than 3 bands, pick RGB bands (example: Sentinel-2 bands 4, 3, 2)
-if image_array.ndim == 3 and image_array.shape[2] >= 3:
-    rgb_array = image_array[:, :, [3, 2, 1]]  # Adjust indices if needed
-else:
-    rgb_array = image_array  # Single-band grayscale
+# Optional: Apply median filter (remove speckle noise)
+image_array = median_filter(image_array, size=(3, 3, 1))
 
-# Normalize to 0-255 for visualization
-image_min = np.min(rgb_array)
-image_max = np.max(rgb_array)
-if image_max > image_min:
-    image_norm = ((rgb_array - image_min) / (image_max - image_min) * 255).astype(np.uint8)
-else:
-    image_norm = np.zeros_like(rgb_array, dtype=np.uint8)
+# Save .npy in cnn_tiles
+os.makedirs("cnn_tiles", exist_ok=True)
+np.save("cnn_tiles/image.npy", image_array)
 
-# Save PNG
-Image.fromarray(image_norm).save(OUTPUT_PNG)
-print(f"Saved PNG preview as {OUTPUT_PNG}")
+# Save PNG preview (only RGB bands)
+rgb = (image_array[:, :, :3] * 255).astype(np.uint8)
+Image.fromarray(rgb).save("noise.png")
+
+print("Preprocessing complete: clipped, normalized, and noise-filtered.")
