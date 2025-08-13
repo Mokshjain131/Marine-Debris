@@ -3,3 +3,7 @@ numpy
 tifffile
 pillow
 python-dotenv
+scikit-image
+pathlib
+opencv-python
+scipy.ndimage
