@@ -1,4 +1,6 @@
 .env
 processed_patches
+processed_patch
 images
 cnn_tiles
+notes.txt

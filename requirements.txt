@@ -1,9 +1,10 @@
-rasterio
 numpy
+pandas
+torch
 tifffile
 pillow
 python-dotenv
+pydantic
 scikit-image
 pathlib
 opencv-python
-scipy.ndimage
