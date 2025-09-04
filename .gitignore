@@ -5,3 +5,6 @@ images
 cnn_tiles
 notes.txt
 .venv
+pyproject.toml
+__pycache__
+.python-version
