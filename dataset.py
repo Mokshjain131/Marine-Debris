@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 import torch
-from torch.utils.data import Dataset, DataLoader, random_split
+from torch.utils.data import Dataset, DataLoader, random_split, TensorDataset
+import h5py
 from dotenv import load_dotenv
 from pathlib import Path
 import os
@@ -85,21 +86,47 @@ def create_dataloaders(train_dataset, val_dataset, test_dataset, batch_size=32):
 
     return train_loader, val_loader, test_loader
 
+def save_to_h5(dataloader, save_path):
+    all_imgs, all_labels = [], []
+    for imgs, labels in dataloader:
+        all_imgs.append(imgs.numpy())
+        all_labels.append(labels.numpy())
+
+    imgs_np = np.concatenate(all_imgs, axis=0)
+    labels_np = np.concatenate(all_labels, axis=0)
+
+    with h5py.File(save_path, "w") as f:
+        f.create_dataset("images", data=imgs_np)
+        f.create_dataset("labels", data=labels_np)
+
+    print(f"Saved to {save_path} | Images: {imgs_np.shape}, Labels: {labels_np.shape}")
+
+def load_from_h5(path):
+    with h5py.File(path, "r") as f:
+        imgs = torch.tensor(f["images"][:], dtype=torch.float32)
+        labels = torch.tensor(f["labels"][:], dtype=torch.float32)
+    print(f"Loaded {path} | Images: {imgs.shape}, Labels: {labels.shape}")
+    return TensorDataset(imgs, labels)
+
 if __name__ == "__main__":
     npy_dir = "processed_patches/npy_clean"
     load_dotenv()
     csv_path = os.getenv("LABELS_CSV")
-    print("Files in NPY_DIR:", os.listdir(npy_dir)[:10])  # show first 10
-    print("CSV path:", csv_path)
 
-    train_dataset, val_dataset, test_dataset = create_datasets(npy_dir, csv_path, train_ratio=0.7, val_ratio=0.15, test_ratio=0.15)
+    train_dataset, val_dataset, test_dataset = create_datasets(
+        npy_dir, csv_path, train_ratio=0.7, val_ratio=0.15, test_ratio=0.15
+    )
     train_loader, val_loader, test_loader = create_dataloaders(train_dataset, val_dataset, test_dataset, batch_size=32)
 
-    print(f"Train size: {len(train_dataset)}")
-    print(f"Test size: {len(test_dataset)}")
-    print(f"Val size: {len(val_dataset)}")
+    # Save to h5
+    save_to_h5(train_loader, "train_data.h5")
+    save_to_h5(val_loader, "val_data.h5")
+    save_to_h5(test_loader, "test_data.h5")
 
-    for imgs, labels in train_loader:
-        print("Batch imgs:", imgs.shape) # (N, C, H, W)
-        print("Batch labels:", labels.shape) # (N, num_classes)
+    # Reload and wrap in TensorDataset
+    train_dataset_h5 = load_from_h5("train_data.h5")
+    train_loader_h5 = DataLoader(train_dataset_h5, batch_size=32, shuffle=True)
+
+    for imgs, labels in train_loader_h5:
+        print("Batch:", imgs.shape, labels.shape)
         break

@@ -1,6 +1,8 @@
 numpy
 pandas
+h5py
 torch
+torchvision
 tifffile
 pillow
 python-dotenv

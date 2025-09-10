@@ -1,9 +1,8 @@
 .env
 processed_patches
-processed_patch
-images
-cnn_tiles
+data
 notes.txt
 .venv
 __pycache__
 .python-version
+*.h5
