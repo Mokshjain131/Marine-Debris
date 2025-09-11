@@ -7,7 +7,6 @@ from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_sc
 from models.resnet18 import ResNetSentinel
 import numpy as np
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 import os
 
 # H5 Dataset Class
@@ -87,8 +86,8 @@ def main():
     lr = 0.001
 
     # Resuming from checkpoint
-    resume = True
-    checkpoint_path = 'checkpoints/resnet_best_25.pth'
+    resume = False
+    checkpoint_path = 'checkpoints/resnet_best.pth'
 
     # Early stopping parameters
     best_val_loss = float('inf')
@@ -210,59 +209,6 @@ def main():
         'history': history,
     }, "checkpoints/resnet_sentinel_epoch100.pth")
     print('Model checkpoint with history saved')
-
-    # Plotting metrics history against iterations
-    epochs = range(1, num_epochs + 1)
-    plt.figure(figsize=(14, 8))
-
-    # Loss
-    plt.subplot(2, 3, 1)
-    plt.plot(epochs, train_loss_history, label='Train Loss')
-    plt.plot(epochs, val_loss_history, label='Val Loss')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.title('Loss over epochs')
-    plt.legend()
-
-    # F1 Score
-    plt.subplot(2, 3, 2)
-    plt.plot(epochs, val_f1_history, label='Val F1', color='purple')
-    plt.xlabel('Epochs')
-    plt.ylabel('F1 Score')
-    plt.title('F1 Score over epochs')
-    plt.legend()
-
-    # Precision
-    plt.subplot(2, 3, 3)
-    plt.plot(epochs, val_prec_history, label='Val Precision', color='green')
-    plt.xlabel('Epochs')
-    plt.ylabel('Precision')
-    plt.title('Precision over epochs')
-    plt.legend()
-
-    # Recall
-    plt.subplot(2, 3, 4)
-    plt.plot(epochs, val_rec_history, label='Val Recall', color='orange')
-    plt.xlabel('Epochs')
-    plt.ylabel('Recall')
-    plt.title('Recall over epochs')
-    plt.legend()
-
-    # Accuracy
-    plt.subplot(2, 3, 5)
-    plt.plot(epochs, val_acc_history, label='Val Accuracy', color='red')
-    plt.xlabel('Epochs')
-    plt.ylabel('Accuracy')
-    plt.title('Accuracy over epochs')
-    plt.legend()
-
-    plt.tight_layout()
-    plt.show()
-
-    # Save plots
-    os.makedirs("checkpoints", exist_ok=True)
-    plt.savefig("checkpoints/training_curves_100.png")
-    print("Training curves saved as png")
 
 if __name__ == '__main__':
     main()
