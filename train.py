@@ -82,14 +82,15 @@ def main():
     test_path = 'test_data.h5'
 
     batch_size = 16
-    num_epochs = 100
+    num_epochs = 50
     lr = 0.001
 
     # Resuming from checkpoint
-    resume = False
-    checkpoint_path = 'checkpoints/resnet_best.pth'
+    resume = True
+    checkpoint_path = 'checkpoints/resnet_sentinel_epoch30.pth'
 
     # Early stopping parameters
+    early_stop = True
     best_val_loss = float('inf')
     patience = 10
     counter = 0
@@ -138,6 +139,7 @@ def main():
         print(f"Resumed from checkpoint at epoch {start_epoch}")
     else:
         print("No checkpoint found, starting fresh training")
+        start_epoch = 0
 
     # Training Loop
     for epoch in range(start_epoch, num_epochs):
@@ -159,31 +161,32 @@ def main():
         val_acc_history.append(val_acc)
 
         # Early stopping check
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
-            counter = 0
+        if early_stop:
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                counter = 0
 
-            os.makedirs("checkpoints", exist_ok=True)
-            torch.save({
-                'epoch': epoch + 1,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'scheduler_state_dict': scheduler.state_dict(),
-                'train_loss_history': train_loss_history,
-                'val_loss_history': val_loss_history,
-                'val_f1_history': val_f1_history,
-                'val_prec_history': val_prec_history,
-                'val_rec_history': val_rec_history,
-                'val_acc_history': val_acc_history,
-                'best_val_loss': best_val_loss,
-            }, f"checkpoints/resnet_best.pth")
+                os.makedirs("checkpoints", exist_ok=True)
+                torch.save({
+                    'epoch': epoch + 1,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'scheduler_state_dict': scheduler.state_dict(),
+                    'train_loss_history': train_loss_history,
+                    'val_loss_history': val_loss_history,
+                    'val_f1_history': val_f1_history,
+                    'val_prec_history': val_prec_history,
+                    'val_rec_history': val_rec_history,
+                    'val_acc_history': val_acc_history,
+                    'best_val_loss': best_val_loss,
+                }, f"checkpoints/resnet_best.pth")
 
-            print(f"Saved new best model at epoch {epoch + 1}")
-        else:
-            counter += 1
-            if counter >= patience:
-                print("Early stopping triggered")
-                break
+                print(f"Saved new best model at epoch {epoch + 1}")
+            else:
+                counter += 1
+                if counter >= patience:
+                    print("Early stopping triggered")
+                    break
 
     # Final test evaluation
     print('\nEvaluating on test set...')
@@ -207,7 +210,7 @@ def main():
         'scheduler_state_dict': scheduler.state_dict(),
         'loss': val_loss_history[-1],
         'history': history,
-    }, "checkpoints/resnet_sentinel_epoch100.pth")
+    }, f"checkpoints/resnet_sentinel_epoch{epoch+1}.pth")
     print('Model checkpoint with history saved')
 
 if __name__ == '__main__':

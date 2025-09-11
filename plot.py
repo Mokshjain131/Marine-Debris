@@ -74,5 +74,5 @@ def plot_from_checkpoint(checkpoint_path, save_path=None):
 
 
 if __name__ == "__main__":
-    checkpoint_file = "checkpoints/resnet_best.pth"
-    plot_from_checkpoint(checkpoint_file, save_path="checkpoints/resnet_best_curves.png")
+    checkpoint_file = "checkpoints/resnet_sentinel_epoch30.pth"
+    plot_from_checkpoint(checkpoint_file, save_path="checkpoints/resnet_best_30_curves.png")
