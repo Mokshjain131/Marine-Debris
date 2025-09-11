@@ -5,4 +5,5 @@ notes.txt
 .venv
 __pycache__
 .python-version
+checkpoints
 *.h5

@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "h5py>=3.14.0",
+    "matplotlib>=3.10.6",
     "numpy>=2.3.3",
     "opencv-python>=4.11.0.86",
     "pandas>=2.3.2",
@@ -14,7 +15,9 @@ dependencies = [
     "pydantic>=2.11.7",
     "python-dotenv>=1.1.1",
     "scikit-image>=0.25.2",
+    "scikit-learn>=1.7.2",
     "tifffile>=2025.8.28",
     "torch>=2.8.0",
     "torchvision>=0.23.0",
+    "tqdm>=4.67.1",
 ]
