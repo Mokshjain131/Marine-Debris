@@ -82,17 +82,17 @@ def main():
     test_path = 'test_data.h5'
 
     batch_size = 16
-    num_epochs = 50
-    lr = 0.001
+    num_epochs = 75
+    lr = 0.0001
 
     # Resuming from checkpoint
     resume = True
-    checkpoint_path = 'checkpoints/resnet_sentinel_epoch30.pth'
+    checkpoint_path = 'checkpoints/resnet_best.pth'
 
     # Early stopping parameters
     early_stop = True
     best_val_loss = float('inf')
-    patience = 10
+    patience = 30
     counter = 0
 
     # Datasets and Dataloaders
@@ -166,20 +166,34 @@ def main():
                 best_val_loss = val_loss
                 counter = 0
 
+                old_train_loss = []
+                old_val_loss = []
+                old_val_f1 = []
+                old_val_prec = []
+                old_val_rec = []
+                old_val_acc = []
+
                 os.makedirs("checkpoints", exist_ok=True)
                 torch.save({
                     'epoch': epoch + 1,
                     'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
                     'scheduler_state_dict': scheduler.state_dict(),
-                    'train_loss_history': train_loss_history,
-                    'val_loss_history': val_loss_history,
-                    'val_f1_history': val_f1_history,
-                    'val_prec_history': val_prec_history,
-                    'val_rec_history': val_rec_history,
-                    'val_acc_history': val_acc_history,
+                    'old_train_loss': checkpoint.get('train_loss_history', []),
+                    'old_val_loss': checkpoint.get('val_loss_history', []),
+                    'old_val_f1': checkpoint.get('val_f1_history', []),
+                    'old_val_prec': checkpoint.get('val_prec_history', []),
+                    'old_val_rec': checkpoint.get('val_rec_history', []),
+                    'old_val_acc': checkpoint.get('val_acc_history', []),
                     'best_val_loss': best_val_loss,
                 }, f"checkpoints/resnet_best.pth")
+
+                train_loss_history = list(old_train_loss)  
+                val_loss_history = list(old_val_loss)
+                val_f1_history = list(old_val_f1)
+                val_prec_history = list(old_val_prec)
+                val_rec_history = list(old_val_rec)
+                val_acc_history = list(old_val_acc)
 
                 print(f"Saved new best model at epoch {epoch + 1}")
             else:
