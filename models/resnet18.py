@@ -5,13 +5,14 @@ import torchvision.models as models
 
 # Custom ResNet
 class ResNetSentinel(nn.Module):
-    def __init__(self, num_bands=11, num_classes=15, pretrained=False):
+    def __init__(self, num_bands=11, num_classes=15, pretrained=False, freeze_backbone=False):
         super(ResNetSentinel, self).__init__()
 
         # Load a pre-trained ResNet18 model
-        self.model = models.resnet18(weights=models.ResNet18.Weights.IMAGENET1K_V1 if pretrained else None)
+        self.model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1 if pretrained else None)
 
         # Modify the first convolutional layer to accept 11 num_bands instead of 3
+        old_conv1 = self.model.conv1
         self.model.conv1 = nn.Conv2d(
             in_channels=num_bands,
             out_channels=self.model.conv1.out_channels,
@@ -21,8 +22,25 @@ class ResNetSentinel(nn.Module):
             bias=False
         )
 
+        # Copy weights when pretrained and we only have 3 channels
+        if pretrained:
+            self._init_conv1_weights(self.model.conv1, old_conv1.weight.data, num_bands)
+
         # Modify the final fully connected layer
         self.model.fc = nn.Linear(self.model.fc.in_features, num_classes)
+
+        # Optionally freeze the backbone
+        if freeze_backbone:
+            for param in self.model.parameters():
+                param.requires_grad = False
+            for param in self.model.fc.parameters():
+                param.requires_grad = True
+
+    def _init_conv1_weights(self, new_conv, old_weights, num_bands):
+        # Xavier initialization for extra bands
+        new_conv.weight.data[:, :3, :, :] = old_weights
+        if num_bands > 3:
+            nn.init.xavier_uniform_(new_conv.weight.data[:,3:,:,:])
 
     def forward(self, x):
         return self.model(x)
@@ -31,7 +49,7 @@ class ResNetSentinel(nn.Module):
 num_bands = 11 # Our dataset has 11 spectral bands
 num_classes = 15 # Number of output classes
 
-model = ResNetSentinel(num_bands=num_bands, num_classes=num_classes, pretrained=False)
+model = ResNetSentinel(num_bands=num_bands, num_classes=num_classes, pretrained=True, freeze_backbone=True)
 
 # Select a device (GPU if available, else CPU)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

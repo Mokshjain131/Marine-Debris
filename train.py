@@ -82,18 +82,22 @@ def main():
     test_path = 'test_data.h5'
 
     batch_size = 16
-    num_epochs = 75
-    lr = 0.0001
+    num_epochs = 30 # Total number of epochs
+    head_epochs = 5 # Number of epochs to train only the head
+    lr_head = 0.001 # Learning rate for head training
+    lr_finetune = 0.0001 # Learning rate for fine-tuning
 
     # Resuming from checkpoint
-    resume = True
+    resume = False
     checkpoint_path = 'checkpoints/resnet_best.pth'
 
     # Early stopping parameters
     early_stop = True
     best_val_loss = float('inf')
-    patience = 30
+    patience = 7
     counter = 0
+
+    start_epoch = 0
 
     # Datasets and Dataloaders
     train_dataset = H5Dataset(train_path)
@@ -109,11 +113,10 @@ def main():
     num_classes = train_dataset[0][1].shape[0]
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = ResNetSentinel(num_bands=num_bands, num_classes=num_classes, pretrained=False).to(device)
+
+    model = ResNetSentinel(num_bands=num_bands, num_classes=num_classes, pretrained=True, freeze_backbone=True).to(device)
 
     criterion = nn.BCEWithLogitsLoss()
-    optimizer = optim.Adam(model.parameters(), lr=lr)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5)
 
     # Value history
     train_loss_history = []
@@ -141,8 +144,39 @@ def main():
         print("No checkpoint found, starting fresh training")
         start_epoch = 0
 
-    # Training Loop
-    for epoch in range(start_epoch, num_epochs):
+    # Phase 1: Head training
+    if start_epoch < head_epochs:
+        print("Starting head training phase")
+        optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=lr_head)
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5)
+
+        for epoch in range(start_epoch, head_epochs):
+            print(f'\nEpoch {epoch+1}/{head_epochs}')
+
+            train_loss = train_one_epoch(model, train_loader, criterion, optimizer, device)
+            val_loss, val_acc, val_f1, val_prec, val_rec = evaluate(model, val_loader, criterion, device)
+
+            scheduler.step(val_loss)
+
+            print(f'Train Loss: {train_loss:.4f}')
+            print(f'Val Loss: {val_loss:.4f} | Accuracy: {val_acc:.4f} | F1: {val_f1:.4f} | Precision: {val_prec:.4f} | Recall: {val_rec:.4f}')
+
+            train_loss_history.append(train_loss)
+            val_loss_history.append(val_loss)
+            val_f1_history.append(val_f1)
+            val_prec_history.append(val_prec)
+            val_rec_history.append(val_rec)
+            val_acc_history.append(val_acc)
+
+    # Phase 2: Fine-tuning
+    print("Starting fine-tuning phase")
+    for param in model.parameters():
+        param.requires_grad = True
+    
+    optimizer = optim.Adam(model.parameters(), lr=lr_finetune)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5)
+
+    for epoch in range(max(start_epoch, head_epochs), num_epochs):
         print(f'\nEpoch {epoch+1}/{num_epochs}')
 
         train_loss = train_one_epoch(model, train_loader, criterion, optimizer, device)
@@ -166,36 +200,22 @@ def main():
                 best_val_loss = val_loss
                 counter = 0
 
-                old_train_loss = []
-                old_val_loss = []
-                old_val_f1 = []
-                old_val_prec = []
-                old_val_rec = []
-                old_val_acc = []
-
                 os.makedirs("checkpoints", exist_ok=True)
                 torch.save({
                     'epoch': epoch + 1,
                     'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
                     'scheduler_state_dict': scheduler.state_dict(),
-                    'old_train_loss': checkpoint.get('train_loss_history', []),
-                    'old_val_loss': checkpoint.get('val_loss_history', []),
-                    'old_val_f1': checkpoint.get('val_f1_history', []),
-                    'old_val_prec': checkpoint.get('val_prec_history', []),
-                    'old_val_rec': checkpoint.get('val_rec_history', []),
-                    'old_val_acc': checkpoint.get('val_acc_history', []),
-                    'best_val_loss': best_val_loss,
+                    "train_loss_history": train_loss_history,
+                    "val_loss_history": val_loss_history,
+                    "val_f1_history": val_f1_history,
+                    "val_prec_history": val_prec_history,
+                    "val_rec_history": val_rec_history,
+                    "val_acc_history": val_acc_history,
+                    "best_val_loss": best_val_loss,
                 }, f"checkpoints/resnet_best.pth")
-
-                train_loss_history = list(old_train_loss)  
-                val_loss_history = list(old_val_loss)
-                val_f1_history = list(old_val_f1)
-                val_prec_history = list(old_val_prec)
-                val_rec_history = list(old_val_rec)
-                val_acc_history = list(old_val_acc)
-
                 print(f"Saved new best model at epoch {epoch + 1}")
+
             else:
                 counter += 1
                 if counter >= patience:
@@ -224,7 +244,7 @@ def main():
         'scheduler_state_dict': scheduler.state_dict(),
         'loss': val_loss_history[-1],
         'history': history,
-    }, f"checkpoints/resnet_sentinel_epoch{epoch+1}.pth")
+    }, f"checkpoints/resnet_sentinel_pretrained_epoch{epoch+1}.pth")
     print('Model checkpoint with history saved')
 
 if __name__ == '__main__':
