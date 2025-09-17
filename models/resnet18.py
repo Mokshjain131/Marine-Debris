@@ -26,8 +26,13 @@ class ResNetSentinel(nn.Module):
         if pretrained:
             self._init_conv1_weights(self.model.conv1, old_conv1.weight.data, num_bands)
 
-        # Modify the final fully connected layer
-        self.model.fc = nn.Linear(self.model.fc.in_features, num_classes)
+        # Modify the final fully connected layer with dropout
+        dropout = 0.4
+        in_features = self.model.fc.in_features
+        self.model.fc = nn.Sequential(
+            nn.Dropout(dropout),
+            nn.Linear(in_features, num_classes)
+        )
 
         # Optionally freeze the backbone
         if freeze_backbone:

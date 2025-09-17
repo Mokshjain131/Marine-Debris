@@ -82,14 +82,14 @@ def main():
     test_path = 'test_data.h5'
 
     batch_size = 16
-    num_epochs = 30 # Total number of epochs
-    head_epochs = 5 # Number of epochs to train only the head
+    num_epochs = 20 # Total number of epochs
+    head_epochs = 20 # Number of epochs to train only the head
     lr_head = 0.001 # Learning rate for head training
     lr_finetune = 0.0001 # Learning rate for fine-tuning
 
     # Resuming from checkpoint
-    resume = False
-    checkpoint_path = 'checkpoints/resnet_best.pth'
+    resume = True
+    checkpoint_path = 'checkpoints/resnet_sentinel_pretrained_epoch15.pth'
 
     # Early stopping parameters
     early_stop = True
@@ -117,6 +117,8 @@ def main():
     model = ResNetSentinel(num_bands=num_bands, num_classes=num_classes, pretrained=True, freeze_backbone=True).to(device)
 
     criterion = nn.BCEWithLogitsLoss()
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=lr_head, weight_decay=1e-5)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5)
 
     # Value history
     train_loss_history = []
@@ -129,9 +131,11 @@ def main():
     if resume and os.path.isfile(checkpoint_path):
         checkpoint = torch.load(checkpoint_path)
         model.load_state_dict(checkpoint['model_state_dict'])
+        start_epoch = checkpoint['epoch']
+        if start_epoch >= head_epochs:
+            optimizer = optim.Adam(model.parameters(), lr=lr_finetune, weight_decay=1e-5)
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         scheduler.load_state_dict(checkpoint['scheduler_state_dict'])  
-        start_epoch = checkpoint['epoch']
         best_val_loss = checkpoint.get('best_val_loss', float('inf'))
         train_loss_history = checkpoint.get('train_loss_history', [])
         val_loss_history = checkpoint.get('val_loss_history', [])
@@ -147,7 +151,7 @@ def main():
     # Phase 1: Head training
     if start_epoch < head_epochs:
         print("Starting head training phase")
-        optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=lr_head)
+        optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=lr_head, weight_decay=1e-5)
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5)
 
         for epoch in range(start_epoch, head_epochs):
@@ -173,7 +177,7 @@ def main():
     for param in model.parameters():
         param.requires_grad = True
     
-    optimizer = optim.Adam(model.parameters(), lr=lr_finetune)
+    optimizer = optim.Adam(model.parameters(), lr=lr_finetune, weight_decay=1e-5)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5)
 
     for epoch in range(max(start_epoch, head_epochs), num_epochs):
