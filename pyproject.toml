@@ -14,6 +14,7 @@ dependencies = [
     "pillow>=11.3.0",
     "pydantic>=2.11.7",
     "python-dotenv>=1.1.1",
+    "rasterio>=1.4.3",
     "scikit-image>=0.25.2",
     "scikit-learn>=1.7.2",
     "tifffile>=2025.8.28",

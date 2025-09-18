@@ -2,8 +2,11 @@
 processed_patches
 data
 notes.txt
+extension.txt
 .venv
 __pycache__
 .python-version
 checkpoints
 *.h5
+evaluation_results
+MARIDA_models

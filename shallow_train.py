@@ -9,20 +9,51 @@ from models.shallow import ShallowCNN
 import numpy as np
 from tqdm import tqdm
 import os
+import random
+from torchvision import transforms
 
-# H5 Dataset Class
+# H5 Dataset Class with multi-band augmentation
 class H5Dataset(Dataset):
-    def __init__(self, h5_path):
+    def __init__(self, h5_path, augment=False):
         self.file = h5py.File(h5_path, 'r')
         self.images = self.file['images']
         self.labels = self.file['labels']
+        self.augment = augment
 
     def __len__(self):
         return len(self.images)
-    
+
+    def _augment_multispectral(self, img):
+        # Apply augmentations that work with multi-band images
+        if random.random() < 0.5:
+            img = torch.flip(img, [1])  # Horizontal flip
+        if random.random() < 0.5:
+            img = torch.flip(img, [2])  # Vertical flip
+
+        # Rotation (90, 180, 270 degrees to avoid interpolation issues)
+        if random.random() < 0.6:
+            k = random.randint(1, 3)
+            img = torch.rot90(img, k, [1, 2])
+
+        # Add noise for robustness
+        if random.random() < 0.3:
+            noise = torch.randn_like(img) * 0.05
+            img = img + noise
+
+        # Brightness adjustment per channel
+        if random.random() < 0.4:
+            brightness_factor = random.uniform(0.9, 1.1)
+            img = img * brightness_factor
+
+        return torch.clamp(img, 0, 1)
+
     def __getitem__(self, idx):
         img = torch.tensor(self.images[idx], dtype=torch.float32)
         lbl = torch.tensor(self.labels[idx], dtype=torch.float32)
+
+        if self.augment and random.random() > 0.2:
+            img = self._augment_multispectral(img)
+
         return img, lbl
     
 # Training and Evaluation
@@ -82,11 +113,11 @@ def main():
     val_path = 'val_data.h5'
     test_path = 'test_data.h5'
 
-    batch_size = 16
-    num_epochs = 30 # Total number of epochs
-    head_epochs = 10 # Number of epochs to train only the head
-    lr_head = 0.001 # Learning rate for head training
-    lr_finetune = 0.0001 # Learning rate for fine-tuning
+    batch_size = 32
+    num_epochs = 20
+    head_epochs = 0
+    lr_head = 0.003
+    lr_finetune = 0.0005
 
     # Resuming from checkpoint
     resume = False
@@ -100,10 +131,10 @@ def main():
 
     start_epoch = 0
 
-    # Datasets and Dataloaders
-    train_dataset = H5Dataset(train_path)
-    val_dataset = H5Dataset(val_path)
-    test_dataset = H5Dataset(test_path)
+    # Datasets and Dataloaders with augmentation
+    train_dataset = H5Dataset(train_path, augment=True)
+    val_dataset = H5Dataset(val_path, augment=False)
+    test_dataset = H5Dataset(test_path, augment=False)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
@@ -115,12 +146,13 @@ def main():
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    model = ResNetSentinel(num_bands=num_bands, num_classes=num_classes, pretrained=True, freeze_backbone=True).to(device)
-    # model = ShallowCNN(num_bands=num_bands, num_classes=num_classes).to(device)
+    # model = ResNetSentinel(num_bands=num_bands, num_classes=num_classes, pretrained=True, freeze_backbone=True).to(device)
+    model = ShallowCNN(num_bands=num_bands, num_classes=num_classes).to(device)
 
-    criterion = nn.BCEWithLogitsLoss()
-    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=lr_head, weight_decay=1e-5)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5)
+    # Weighted loss for class imbalance and better optimizer
+    criterion = nn.BCEWithLogitsLoss(pos_weight=torch.ones(num_classes) * 2.0).to(device)
+    optimizer = optim.AdamW(model.parameters(), lr=lr_head, weight_decay=1e-4)
+    scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=2)
 
     # Value history
     train_loss_history = []
@@ -250,7 +282,7 @@ def main():
         'scheduler_state_dict': scheduler.state_dict(),
         'loss': val_loss_history[-1],
         'history': history,
-    }, f"checkpoints/resnet_sentinel_epoch{epoch+1}.pth")
+    }, f"checkpoints/shallow_sentinel_epoch{epoch+1}.pth")
     print('Model checkpoint with history saved')
 
 if __name__ == '__main__':

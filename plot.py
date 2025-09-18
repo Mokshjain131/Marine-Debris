@@ -75,5 +75,5 @@ def plot_from_checkpoint(checkpoint_path, save_path=None):
 
 
 if __name__ == "__main__":
-    checkpoint_file = "checkpoints/resnet_sentinel_pretrained_epoch15.pth"
-    plot_from_checkpoint(checkpoint_file, save_path="checkpoints/resnet_best_pretrained_15_curves.png")
+    checkpoint_file = "MARIDA_models/resnet/trained_models/18/model.pth"
+    plot_from_checkpoint(checkpoint_file, save_path="pretrained/pretrained.png")
