@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.models as models
+import math
 
 # Custom ResNet
 class ResNetSentinel(nn.Module):
@@ -11,8 +12,11 @@ class ResNetSentinel(nn.Module):
         # Load a pre-trained ResNet18 model
         self.model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1 if pretrained else None)
 
-        # Modify the first convolutional layer to accept 11 num_bands instead of 3
-        old_conv1 = self.model.conv1
+        # Store original conv1 weights before modification
+        if pretrained:
+            original_conv1_weight = self.model.conv1.weight.data.clone()
+
+        # Modify the first convolutional layer to accept num_bands instead of 3
         self.model.conv1 = nn.Conv2d(
             in_channels=num_bands,
             out_channels=self.model.conv1.out_channels,
@@ -22,9 +26,12 @@ class ResNetSentinel(nn.Module):
             bias=False
         )
 
-        # Copy weights when pretrained and we only have 3 channels
-        if pretrained:
-            self._init_conv1_weights(self.model.conv1, old_conv1.weight.data, num_bands)
+        # Initialize weights properly
+        if pretrained and num_bands != 3:
+            self._init_conv1_weights_improved(self.model.conv1, original_conv1_weight, num_bands)
+        elif not pretrained:
+            # Standard Kaiming initialization for training from scratch
+            nn.init.kaiming_normal_(self.model.conv1.weight, mode='fan_out', nonlinearity='relu')
 
         # Modify the final fully connected layer with dropout
         dropout = 0.4
@@ -41,11 +48,46 @@ class ResNetSentinel(nn.Module):
             for param in self.model.fc.parameters():
                 param.requires_grad = True
 
-    def _init_conv1_weights(self, new_conv, old_weights, num_bands):
-        # Xavier initialization for extra bands
-        new_conv.weight.data[:, :3, :, :] = old_weights
-        if num_bands > 3:
-            nn.init.xavier_uniform_(new_conv.weight.data[:,3:,:,:])
+    def _init_conv1_weights_improved(self, new_conv, pretrained_weights, num_bands):
+        """
+        Improved weight initialization for multi-spectral adaptation of ImageNet pretrained weights
+        """
+        with torch.no_grad():
+            # Get the pretrained RGB weights (64, 3, 7, 7)
+            out_channels, in_channels_rgb, kh, kw = pretrained_weights.shape
+
+            if num_bands <= 3:
+                # If we have 3 or fewer bands, just use subset of pretrained weights
+                new_conv.weight.data = pretrained_weights[:, :num_bands, :, :]
+            else:
+                # Method 1: Repeat and average strategy
+                # This works better than random initialization for additional channels
+
+                # Initialize all weights with pretrained RGB weights (repeated)
+                for i in range(num_bands):
+                    rgb_idx = i % 3  # Cycle through RGB channels
+                    new_conv.weight.data[:, i, :, :] = pretrained_weights[:, rgb_idx, :, :]
+
+                # Method 2: For bands beyond RGB, use spectral-aware initialization
+                if num_bands > 3:
+                    # For additional bands (like NIR, SWIR), use average of RGB with slight perturbation
+                    rgb_avg = pretrained_weights.mean(dim=1, keepdim=True)  # Average across RGB channels
+
+                    # Apply the average with small random perturbations for bands 4+
+                    for i in range(3, num_bands):
+                        # Use RGB average as base, add small noise for diversity
+                        perturbation = torch.randn_like(rgb_avg) * 0.1 * pretrained_weights.std()
+                        new_conv.weight.data[:, i, :, :] = (rgb_avg + perturbation).squeeze(1)
+
+                # Normalize to maintain similar activation magnitude
+                # Scale weights to preserve the magnitude similar to original
+                original_std = pretrained_weights.std()
+                new_std = new_conv.weight.data.std()
+                if new_std > 0:
+                    new_conv.weight.data *= (original_std / new_std)
+
+        print(f"Initialized conv1 weights: {num_bands} bands using ImageNet RGB pretrained weights")
+        print(f"Original RGB weight std: {pretrained_weights.std():.6f}, New weight std: {new_conv.weight.data.std():.6f}")
 
     def forward(self, x):
         return self.model(x)
