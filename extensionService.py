@@ -58,7 +58,8 @@ def plan_debris_collection_route(grid, start_pos, budget):
     for i in range(1, num_features + 1):
         coords = np.argwhere(labeled_array == i)
         if coords.size > 0:
-            center_pos = tuple(np.mean(coords, axis=0).round().astype(int))
+            # AFTER
+            center_pos = tuple(map(int, np.mean(coords, axis=0).round().astype(int)))
             nodes[i] = {"pos": center_pos, "prize": len(coords), "id": i}
 
     print(f"Analysis complete: Found {len(nodes)-1} debris clusters (nodes).")
