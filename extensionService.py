@@ -111,14 +111,14 @@ def plan_debris_collection_route(grid, start_pos, budget):
         first_destination_node = tour[1]
         initial_direction = get_direction(start_node['pos'], first_destination_node['pos'])
         
-        print(f"🚀 Initial Move: Head {initial_direction} towards Node {first_destination_node['id']} at {first_destination_node['pos']}.")
-        print(f"✔️ Optimal Path Found: {[node['id'] for node in tour]}")
-        print(f"📍 Path Coordinates: {[node['pos'] for node in tour]}")
-        print(f"🏆 Total Prize Collected: {total_prize}")
-        print(f"⛽ Total Distance Traveled: {total_distance:.2f} (Budget was {budget})")
+        print(f"Initial Move: Head {initial_direction} towards Node {first_destination_node['id']} at {first_destination_node['pos']}.")
+        print(f"Optimal Path Found: {[node['id'] for node in tour]}")
+        print(f"Path Coordinates: {[node['pos'] for node in tour]}")
+        print(f"Total Prize Collected: {total_prize}")
+        print(f"Total Distance Traveled: {total_distance:.2f} (Budget was {budget})")
     else:
-        print("⚠️ No viable route found within the given travel budget.")
-        print(f"   Consider increasing the budget of {budget}.")
+        print("No viable route found within the given travel budget.")
+        print(f"Consider increasing the budget of {budget}.")
 
 # --- Main Execution ---
 if __name__ == '__main__':
