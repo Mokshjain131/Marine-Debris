@@ -213,35 +213,33 @@ def plan_debris_collection_route(grid, start_pos, budget):
 
     # --- Step 4: Visual Output ---
     plt.figure(figsize=(8, 8))
-    # Use imshow to draw the grid: 0=white, 1=lightblue
     plt.imshow(grid_array, cmap='Blues', interpolation='nearest', alpha=0.5)
 
-    # Plot all identified node centers
     all_node_coords = np.array([data['pos'] for data in nodes.values()])
     plt.scatter(all_node_coords[:, 1], all_node_coords[:, 0], c='gray', s=100, label='Debris Clusters (All)')
-
-    # Plot the start position
     plt.scatter(start_pos[1], start_pos[0], c='green', s=200, marker='*', label='Start/End Point')
 
-    # Plot the planned route if one was found
     if len(tour) > 2:
         path_coords = np.array([node['pos'] for node in tour])
-        # Plot path segments
         plt.plot(path_coords[:, 1], path_coords[:, 0], marker='o', color='red', linestyle='-', linewidth=2, markersize=8, label='Optimal Path')
-        # Annotate nodes on the path
         for node in tour:
             if node['id'] != 0:
                 plt.text(node['pos'][1] + 0.3, node['pos'][0], f"Node {node['id']}", fontsize=12, color='black')
 
     plt.title('Mission Plan Visualization', fontsize=16)
-    plt.xlabel('X Coordinate')
-    plt.ylabel('Y Coordinate')
+    plt.xlabel('X Coordinate (Column)')
+    plt.ylabel('Y Coordinate (Row)')
     plt.legend()
     plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-    # Invert y-axis to match the matrix (row 0 at the top)
-    plt.gca().invert_yaxis()
-    plt.show()
     
+    plt.gca().invert_yaxis()
+    plt.xlim(-0.5, grid_array.shape[1] - 0.5)
+    plt.ylim(grid_array.shape[0] - 0.5, -0.5)
+    plt.xticks(np.arange(grid_array.shape[1]))
+    plt.yticks(np.arange(grid_array.shape[0]))
+    
+    plt.show()
+
 # --- Main Execution ---
 if __name__ == '__main__':
     # Define the world grid, start position, and budget
