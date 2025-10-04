@@ -67,6 +67,42 @@ def plan_debris_collection_route(grid, start_pos, budget):
             print(f"  - Node {nid}: Position={data['pos']}, Prize={data['prize']}")
     print("-" * 30)
 
+    # --- Step 2: Algorithm - Greedy Insertion Heuristic ---
+    def manhattan_distance(p1, p2):
+        return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+    tour = [nodes[0], nodes[0]] 
+    total_prize = 0
+    total_distance = 0
+    unvisited_node_ids = set(n for n in nodes if n != 0)
+
+    while True:
+        best_insertion = None
+        best_score = -1
+        for node_id in unvisited_node_ids:
+            node_to_insert = nodes[node_id]
+            for i in range(len(tour) - 1):
+                prev_node, next_node = tour[i], tour[i+1]
+                cost_increase = (manhattan_distance(prev_node['pos'], node_to_insert['pos']) +
+                                 manhattan_distance(node_to_insert['pos'], next_node['pos']) -
+                                 manhattan_distance(prev_node['pos'], next_node['pos']))
+                
+                if total_distance + cost_increase <= budget:
+                    score = node_to_insert['prize'] / (cost_increase + 1e-9)
+                    if score > best_score:
+                        best_score = score
+                        best_insertion = {"node": node_to_insert, "index": i + 1, "cost": cost_increase}
+        
+        if best_insertion:
+            node = best_insertion['node']
+            tour.insert(best_insertion['index'], node)
+            total_distance += best_insertion['cost']
+            total_prize += node['prize']
+            unvisited_node_ids.remove(node['id'])
+        else:
+            break
+            
+    
 # --- Main Execution ---
 if __name__ == '__main__':
     # Define the world grid, start position, and budget
