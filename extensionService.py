@@ -51,7 +51,22 @@ def plan_debris_collection_route(grid, start_pos, budget):
                 return direction
         return "East" # Catches the case where angle is between 337.5 and 360
 
+    # --- Step 1: Preprocessing - Find Nodes and Prizes ---
+    labeled_array, num_features = label(grid)
+    nodes = {0: {"pos": start_pos, "prize": 0, "id": 0}}
     
+    for i in range(1, num_features + 1):
+        coords = np.argwhere(labeled_array == i)
+        if coords.size > 0:
+            center_pos = tuple(np.mean(coords, axis=0).round().astype(int))
+            nodes[i] = {"pos": center_pos, "prize": len(coords), "id": i}
+
+    print(f"Analysis complete: Found {len(nodes)-1} debris clusters (nodes).")
+    for nid, data in nodes.items():
+        if nid > 0:
+            print(f"  - Node {nid}: Position={data['pos']}, Prize={data['prize']}")
+    print("-" * 30)
+
 # --- Main Execution ---
 if __name__ == '__main__':
     # Define the world grid, start position, and budget
