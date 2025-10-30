@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 #!/usr/bin/env python3
 """
 Generate Geolocation Hashmap from Marine Debris Predictions
@@ -23,7 +26,7 @@ import re
 
 # Import model
 sys.path.append(str(Path(__file__).parent / 'models'))
-from resnet18 import ResNetSentinel
+from models.resnet18 import ResNetSentinel
 
 
 def load_model(checkpoint_path: str, device: torch.device) -> nn.Module:
