@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_6b4c4840b75a6ec963d52d684da3712e {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css"/>
+</head>
+<body>
+    
+    
+        <div style="position: fixed; 
+                    top: 10px; right: 10px; width: 250px; 
+                    background-color: white; border: 2px solid grey;
+                    z-index: 9999; font-size: 14px; padding: 10px;
+                    box-shadow: 2px 2px 6px rgba(0,0,0,0.3);">
+            <h4 style="margin: 0 0 10px 0;">Collection Route</h4>
+            <p style="margin: 5px 0;"><b>Total Stops:</b> 12</p>
+            <p style="margin: 5px 0;"><b>Total Distance:</b> 31.2 km</p>
+            <p style="margin: 5px 0;"><b>Total Prize:</b> 617</p>
+            <hr style="margin: 5px 0;">
+            <p style="margin: 5px 0; font-size: 12px;">
+                <i class="glyphicon glyphicon-play" style="color: green;"></i> Start Point<br>
+                <i class="glyphicon glyphicon-trash" style="color: red;"></i> Debris Collection<br>
+                <i class="glyphicon glyphicon-stop" style="color: black;"></i> End Point
+            </p>
+        </div>
+        
+    
+            <div class="folium-map" id="map_6b4c4840b75a6ec963d52d684da3712e" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_6b4c4840b75a6ec963d52d684da3712e = L.map(
+                "map_6b4c4840b75a6ec963d52d684da3712e",
+                {
+                    center: [11.998750000000001, -86.995],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 4,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_1cad6f3ad8de9749234c17d1ab36711d = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_1cad6f3ad8de9749234c17d1ab36711d.addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+    
+            var poly_line_5c8a2c4f307f80b6fcae8d2adb394b76 = L.polyline(
+                [[12.0, -87.0], [11.985, -86.985], [11.955, -86.97], [11.97, -86.97], [12.0, -86.97], [12.045, -86.97], [12.015, -87.0], [12.015, -87.03], [12.0, -87.045], [12.0, -87.0], [12.0, -87.0], [12.0, -87.0]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+    
+        var popup_bda197e1addd86557bb2b9c442897ad2 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_5b772f849259bb2acd3d2a33296a924d = $(`<div id="html_5b772f849259bb2acd3d2a33296a924d" style="width: 100.0%; height: 100.0%;">Collection Route</div>`)[0];
+                popup_bda197e1addd86557bb2b9c442897ad2.setContent(html_5b772f849259bb2acd3d2a33296a924d);
+            
+        
+
+        poly_line_5c8a2c4f307f80b6fcae8d2adb394b76.bindPopup(popup_bda197e1addd86557bb2b9c442897ad2)
+        ;
+
+        
+    
+    
+            var marker_85321f9afb0fc7500f5571b425c8f352 = L.marker(
+                [12.0, -87.0],
+                {
+}
+            ).addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+    
+            var icon_27e541783889dbd26092f51b2c76d7b9 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "play",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_3e936fb44e1e8d0d6de8ed033f437847 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_111f32286f6e407e9d3447b766f9e234 = $(`<div id="html_111f32286f6e407e9d3447b766f9e234" style="width: 100.0%; height: 100.0%;">             <div style="font-family: Arial; width: 220px;">                 <h4 style="margin: 5px 0; color: #1976d2;">                     Stop #1                 </h4>                 <hr style="margin: 5px 0;">                 <b>Location:</b> START<br>                 <b>Coordinates:</b> (12.00, -87.00)<br>                 <b>Prize:</b> 0 debris units<br>                              </div>             </div>`)[0];
+                popup_3e936fb44e1e8d0d6de8ed033f437847.setContent(html_111f32286f6e407e9d3447b766f9e234);
+            
+        
+
+        marker_85321f9afb0fc7500f5571b425c8f352.bindPopup(popup_3e936fb44e1e8d0d6de8ed033f437847)
+        ;
+
+        
+    
+    
+            marker_85321f9afb0fc7500f5571b425c8f352.bindTooltip(
+                `<div>
+                     Stop 1: START
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_85321f9afb0fc7500f5571b425c8f352.setIcon(icon_27e541783889dbd26092f51b2c76d7b9);
+            
+    
+            var marker_e39b6f22dc785ecf82b566b02d4bf10d = L.marker(
+                [11.985, -86.985],
+                {
+}
+            ).addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+    
+            var icon_5eaf727b1f1d00ee48f588fd0aacf102 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "trash",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_f26a883eb843b0453a9c907e5be108e6 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_58161aebf0c476bbdbbfb161f86d4c3f = $(`<div id="html_58161aebf0c476bbdbbfb161f86d4c3f" style="width: 100.0%; height: 100.0%;">             <div style="font-family: Arial; width: 220px;">                 <h4 style="margin: 5px 0; color: #1976d2;">                     Stop #2                 </h4>                 <hr style="margin: 5px 0;">                 <b>Location:</b> 14-9-18_16PCC_16<br>                 <b>Coordinates:</b> (11.98, -86.98)<br>                 <b>Prize:</b> 72 debris units<br>                 <b>Confidence:</b> 72.4%<br>             </div>             </div>`)[0];
+                popup_f26a883eb843b0453a9c907e5be108e6.setContent(html_58161aebf0c476bbdbbfb161f86d4c3f);
+            
+        
+
+        marker_e39b6f22dc785ecf82b566b02d4bf10d.bindPopup(popup_f26a883eb843b0453a9c907e5be108e6)
+        ;
+
+        
+    
+    
+            marker_e39b6f22dc785ecf82b566b02d4bf10d.bindTooltip(
+                `<div>
+                     Stop 2: 14-9-18_16PCC_16
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_e39b6f22dc785ecf82b566b02d4bf10d.setIcon(icon_5eaf727b1f1d00ee48f588fd0aacf102);
+            
+    
+            var marker_e8e3fe2e9c1487ed3b1d3ab635a472d1 = L.marker(
+                [11.955, -86.97],
+                {
+}
+            ).addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+    
+            var icon_798a608d48537932658e438c13d3ec23 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "trash",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_bc88ac5520f9dcb8acd4133413284bbe = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_262da723c1e81f801459d92700059d0e = $(`<div id="html_262da723c1e81f801459d92700059d0e" style="width: 100.0%; height: 100.0%;">             <div style="font-family: Arial; width: 220px;">                 <h4 style="margin: 5px 0; color: #1976d2;">                     Stop #3                 </h4>                 <hr style="margin: 5px 0;">                 <b>Location:</b> 19-9-18_16PDC_5<br>                 <b>Coordinates:</b> (11.96, -86.97)<br>                 <b>Prize:</b> 83 debris units<br>                 <b>Confidence:</b> 83.7%<br>             </div>             </div>`)[0];
+                popup_bc88ac5520f9dcb8acd4133413284bbe.setContent(html_262da723c1e81f801459d92700059d0e);
+            
+        
+
+        marker_e8e3fe2e9c1487ed3b1d3ab635a472d1.bindPopup(popup_bc88ac5520f9dcb8acd4133413284bbe)
+        ;
+
+        
+    
+    
+            marker_e8e3fe2e9c1487ed3b1d3ab635a472d1.bindTooltip(
+                `<div>
+                     Stop 3: 19-9-18_16PDC_5
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_e8e3fe2e9c1487ed3b1d3ab635a472d1.setIcon(icon_798a608d48537932658e438c13d3ec23);
+            
+    
+            var marker_4401752aabb6abf5a5525482989fcca8 = L.marker(
+                [11.97, -86.97],
+                {
+}
+            ).addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+    
+            var icon_951b6e0b5311f978db1e3a46790937b8 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "trash",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_d1feef9570d0839f8805d4d095dec403 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_06653209363b62151c625d65732b2bdd = $(`<div id="html_06653209363b62151c625d65732b2bdd" style="width: 100.0%; height: 100.0%;">             <div style="font-family: Arial; width: 220px;">                 <h4 style="margin: 5px 0; color: #1976d2;">                     Stop #4                 </h4>                 <hr style="margin: 5px 0;">                 <b>Location:</b> 14-9-18_16PCC_11<br>                 <b>Coordinates:</b> (11.97, -86.97)<br>                 <b>Prize:</b> 68 debris units<br>                 <b>Confidence:</b> 68.5%<br>             </div>             </div>`)[0];
+                popup_d1feef9570d0839f8805d4d095dec403.setContent(html_06653209363b62151c625d65732b2bdd);
+            
+        
+
+        marker_4401752aabb6abf5a5525482989fcca8.bindPopup(popup_d1feef9570d0839f8805d4d095dec403)
+        ;
+
+        
+    
+    
+            marker_4401752aabb6abf5a5525482989fcca8.bindTooltip(
+                `<div>
+                     Stop 4: 14-9-18_16PCC_11
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_4401752aabb6abf5a5525482989fcca8.setIcon(icon_951b6e0b5311f978db1e3a46790937b8);
+            
+    
+            var marker_6f2bbee4d1fcc151ece04beccfae6f74 = L.marker(
+                [12.0, -86.97],
+                {
+}
+            ).addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+    
+            var icon_ac53d0e4c714424d065ba331817fb650 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "trash",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_f03fd0b9774871fa6ce698b3cb1bd1ab = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_989819b0b12c88c1836382988cc90600 = $(`<div id="html_989819b0b12c88c1836382988cc90600" style="width: 100.0%; height: 100.0%;">             <div style="font-family: Arial; width: 220px;">                 <h4 style="margin: 5px 0; color: #1976d2;">                     Stop #5                 </h4>                 <hr style="margin: 5px 0;">                 <b>Location:</b> 12-12-20_16PCC_23<br>                 <b>Coordinates:</b> (12.00, -86.97)<br>                 <b>Prize:</b> 70 debris units<br>                 <b>Confidence:</b> 70.1%<br>             </div>             </div>`)[0];
+                popup_f03fd0b9774871fa6ce698b3cb1bd1ab.setContent(html_989819b0b12c88c1836382988cc90600);
+            
+        
+
+        marker_6f2bbee4d1fcc151ece04beccfae6f74.bindPopup(popup_f03fd0b9774871fa6ce698b3cb1bd1ab)
+        ;
+
+        
+    
+    
+            marker_6f2bbee4d1fcc151ece04beccfae6f74.bindTooltip(
+                `<div>
+                     Stop 5: 12-12-20_16PCC_23
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_6f2bbee4d1fcc151ece04beccfae6f74.setIcon(icon_ac53d0e4c714424d065ba331817fb650);
+            
+    
+            var marker_ba55b8ac435d31081020821e8638c4bf = L.marker(
+                [12.045, -86.97],
+                {
+}
+            ).addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+    
+            var icon_91e13a74bcd589808addbe999a1c4cb0 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "trash",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_162275be328e013238a269184c4303a9 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_e7e2a7e95bd24f5e84f9a2499f87ba05 = $(`<div id="html_e7e2a7e95bd24f5e84f9a2499f87ba05" style="width: 100.0%; height: 100.0%;">             <div style="font-family: Arial; width: 220px;">                 <h4 style="margin: 5px 0; color: #1976d2;">                     Stop #6                 </h4>                 <hr style="margin: 5px 0;">                 <b>Location:</b> 14-9-18_16PCC_41<br>                 <b>Coordinates:</b> (12.04, -86.97)<br>                 <b>Prize:</b> 51 debris units<br>                 <b>Confidence:</b> 51.3%<br>             </div>             </div>`)[0];
+                popup_162275be328e013238a269184c4303a9.setContent(html_e7e2a7e95bd24f5e84f9a2499f87ba05);
+            
+        
+
+        marker_ba55b8ac435d31081020821e8638c4bf.bindPopup(popup_162275be328e013238a269184c4303a9)
+        ;
+
+        
+    
+    
+            marker_ba55b8ac435d31081020821e8638c4bf.bindTooltip(
+                `<div>
+                     Stop 6: 14-9-18_16PCC_41
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_ba55b8ac435d31081020821e8638c4bf.setIcon(icon_91e13a74bcd589808addbe999a1c4cb0);
+            
+    
+            var marker_3cc5c47f3de2d9923536bb3b0b895c8c = L.marker(
+                [12.015, -87.0],
+                {
+}
+            ).addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+    
+            var icon_76173dba6fe84b62e50fcd78fa06d07f = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "trash",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_3a285dbaaddfe943a0acb6f33f5628e0 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_feff9c5b53af37fa3138e50a7e3f2cbb = $(`<div id="html_feff9c5b53af37fa3138e50a7e3f2cbb" style="width: 100.0%; height: 100.0%;">             <div style="font-family: Arial; width: 220px;">                 <h4 style="margin: 5px 0; color: #1976d2;">                     Stop #7                 </h4>                 <hr style="margin: 5px 0;">                 <b>Location:</b> 27-1-19_16PCC_27<br>                 <b>Coordinates:</b> (12.02, -87.00)<br>                 <b>Prize:</b> 68 debris units<br>                 <b>Confidence:</b> 68.1%<br>             </div>             </div>`)[0];
+                popup_3a285dbaaddfe943a0acb6f33f5628e0.setContent(html_feff9c5b53af37fa3138e50a7e3f2cbb);
+            
+        
+
+        marker_3cc5c47f3de2d9923536bb3b0b895c8c.bindPopup(popup_3a285dbaaddfe943a0acb6f33f5628e0)
+        ;
+
+        
+    
+    
+            marker_3cc5c47f3de2d9923536bb3b0b895c8c.bindTooltip(
+                `<div>
+                     Stop 7: 27-1-19_16PCC_27
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_3cc5c47f3de2d9923536bb3b0b895c8c.setIcon(icon_76173dba6fe84b62e50fcd78fa06d07f);
+            
+    
+            var marker_a244672bf811c0077e440e69c8dd552f = L.marker(
+                [12.015, -87.03],
+                {
+}
+            ).addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+    
+            var icon_555973c08eeaf23ef11fbaa254576c30 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "trash",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_e92797e15ecf2c9a145f27afdadea895 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_0354eef67429c08c413c95ee1262f500 = $(`<div id="html_0354eef67429c08c413c95ee1262f500" style="width: 100.0%; height: 100.0%;">             <div style="font-family: Arial; width: 220px;">                 <h4 style="margin: 5px 0; color: #1976d2;">                     Stop #8                 </h4>                 <hr style="margin: 5px 0;">                 <b>Location:</b> 19-9-18_16PDC_25<br>                 <b>Coordinates:</b> (12.02, -87.03)<br>                 <b>Prize:</b> 48 debris units<br>                 <b>Confidence:</b> 48.9%<br>             </div>             </div>`)[0];
+                popup_e92797e15ecf2c9a145f27afdadea895.setContent(html_0354eef67429c08c413c95ee1262f500);
+            
+        
+
+        marker_a244672bf811c0077e440e69c8dd552f.bindPopup(popup_e92797e15ecf2c9a145f27afdadea895)
+        ;
+
+        
+    
+    
+            marker_a244672bf811c0077e440e69c8dd552f.bindTooltip(
+                `<div>
+                     Stop 8: 19-9-18_16PDC_25
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_a244672bf811c0077e440e69c8dd552f.setIcon(icon_555973c08eeaf23ef11fbaa254576c30);
+            
+    
+            var marker_63db18bec789eb6905cca97654a565d6 = L.marker(
+                [12.0, -87.045],
+                {
+}
+            ).addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+    
+            var icon_5cfcf70749e35c7a6dada187df8f2ac4 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "trash",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_e17f337813c24b09bae99a40f9059b43 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_ceea45f262fbc7fff2998082ca57adec = $(`<div id="html_ceea45f262fbc7fff2998082ca57adec" style="width: 100.0%; height: 100.0%;">             <div style="font-family: Arial; width: 220px;">                 <h4 style="margin: 5px 0; color: #1976d2;">                     Stop #9                 </h4>                 <hr style="margin: 5px 0;">                 <b>Location:</b> 19-9-18_16PDC_18<br>                 <b>Coordinates:</b> (12.00, -87.05)<br>                 <b>Prize:</b> 49 debris units<br>                 <b>Confidence:</b> 49.5%<br>             </div>             </div>`)[0];
+                popup_e17f337813c24b09bae99a40f9059b43.setContent(html_ceea45f262fbc7fff2998082ca57adec);
+            
+        
+
+        marker_63db18bec789eb6905cca97654a565d6.bindPopup(popup_e17f337813c24b09bae99a40f9059b43)
+        ;
+
+        
+    
+    
+            marker_63db18bec789eb6905cca97654a565d6.bindTooltip(
+                `<div>
+                     Stop 9: 19-9-18_16PDC_18
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_63db18bec789eb6905cca97654a565d6.setIcon(icon_5cfcf70749e35c7a6dada187df8f2ac4);
+            
+    
+            var marker_d2b1796452fe48ce2b5e28c4dd0a5b7b = L.marker(
+                [12.0, -87.0],
+                {
+}
+            ).addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+    
+            var icon_c67b7cfbbba1d7a7cda4a5f663e25efb = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "trash",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_0b6352bbc0395f6513740e972d3d3845 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_d8719ea57679ba4280e611dd34e155ad = $(`<div id="html_d8719ea57679ba4280e611dd34e155ad" style="width: 100.0%; height: 100.0%;">             <div style="font-family: Arial; width: 220px;">                 <h4 style="margin: 5px 0; color: #1976d2;">                     Stop #10                 </h4>                 <hr style="margin: 5px 0;">                 <b>Location:</b> 12-12-20_16PCC_21<br>                 <b>Coordinates:</b> (12.00, -87.00)<br>                 <b>Prize:</b> 49 debris units<br>                 <b>Confidence:</b> 49.5%<br>             </div>             </div>`)[0];
+                popup_0b6352bbc0395f6513740e972d3d3845.setContent(html_d8719ea57679ba4280e611dd34e155ad);
+            
+        
+
+        marker_d2b1796452fe48ce2b5e28c4dd0a5b7b.bindPopup(popup_0b6352bbc0395f6513740e972d3d3845)
+        ;
+
+        
+    
+    
+            marker_d2b1796452fe48ce2b5e28c4dd0a5b7b.bindTooltip(
+                `<div>
+                     Stop 10: 12-12-20_16PCC_21
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_d2b1796452fe48ce2b5e28c4dd0a5b7b.setIcon(icon_c67b7cfbbba1d7a7cda4a5f663e25efb);
+            
+    
+            var marker_60ba61d24510851a24e16a1ab36b42fa = L.marker(
+                [12.0, -87.0],
+                {
+}
+            ).addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+    
+            var icon_ae4d37c8c4dceaee00d911c5046a4947 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "trash",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_d574a95358e0d126b9c279a771fff4e7 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_4b1a116caedd59219538234edae91d77 = $(`<div id="html_4b1a116caedd59219538234edae91d77" style="width: 100.0%; height: 100.0%;">             <div style="font-family: Arial; width: 220px;">                 <h4 style="margin: 5px 0; color: #1976d2;">                     Stop #11                 </h4>                 <hr style="margin: 5px 0;">                 <b>Location:</b> 16-2-18_16PEC_21<br>                 <b>Coordinates:</b> (12.00, -87.00)<br>                 <b>Prize:</b> 59 debris units<br>                 <b>Confidence:</b> 59.5%<br>             </div>             </div>`)[0];
+                popup_d574a95358e0d126b9c279a771fff4e7.setContent(html_4b1a116caedd59219538234edae91d77);
+            
+        
+
+        marker_60ba61d24510851a24e16a1ab36b42fa.bindPopup(popup_d574a95358e0d126b9c279a771fff4e7)
+        ;
+
+        
+    
+    
+            marker_60ba61d24510851a24e16a1ab36b42fa.bindTooltip(
+                `<div>
+                     Stop 11: 16-2-18_16PEC_21
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_60ba61d24510851a24e16a1ab36b42fa.setIcon(icon_ae4d37c8c4dceaee00d911c5046a4947);
+            
+    
+            var marker_c1748a71c7f91adbc7683874a6d86a5f = L.marker(
+                [12.0, -87.0],
+                {
+}
+            ).addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+    
+            var icon_92d289cb9bf4226c39a04e08fe702c6f = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "black",
+  "iconColor": "white",
+  "icon": "stop",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_96f3cd04930f3dddeb1d3d7b8a3469df = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_92a3e2b016aafd56bffa0be8a5a72866 = $(`<div id="html_92a3e2b016aafd56bffa0be8a5a72866" style="width: 100.0%; height: 100.0%;">             <div style="font-family: Arial; width: 220px;">                 <h4 style="margin: 5px 0; color: #1976d2;">                     Stop #12                 </h4>                 <hr style="margin: 5px 0;">                 <b>Location:</b> START<br>                 <b>Coordinates:</b> (12.00, -87.00)<br>                 <b>Prize:</b> 0 debris units<br>                              </div>             </div>`)[0];
+                popup_96f3cd04930f3dddeb1d3d7b8a3469df.setContent(html_92a3e2b016aafd56bffa0be8a5a72866);
+            
+        
+
+        marker_c1748a71c7f91adbc7683874a6d86a5f.bindPopup(popup_96f3cd04930f3dddeb1d3d7b8a3469df)
+        ;
+
+        
+    
+    
+            marker_c1748a71c7f91adbc7683874a6d86a5f.bindTooltip(
+                `<div>
+                     Stop 12: START
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_c1748a71c7f91adbc7683874a6d86a5f.setIcon(icon_92d289cb9bf4226c39a04e08fe702c6f);
+            
+    
+            L.control.fullscreen(
+                {
+  "position": "topleft",
+  "title": "Full Screen",
+  "titleCancel": "Exit Full Screen",
+  "forceSeparateButton": false,
+}
+            ).addTo(map_6b4c4840b75a6ec963d52d684da3712e);
+        
+</script>
+</html>

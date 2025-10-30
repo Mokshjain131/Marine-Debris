@@ -1,0 +1,267 @@
+{
+  "geolocation_map": {
+    "12-12-20_16PCC": {
+      "has_debris": true,
+      "confidence": 0.7013,
+      "num_patches": 28,
+      "debris_patches": 2,
+      "date": "12-12-20",
+      "utm_tile": "16PCC",
+      "coordinates": {
+        "lat": 12,
+        "lon": -87
+      }
+    },
+    "14-11-18_48PZC": {
+      "has_debris": false,
+      "confidence": 0.3828,
+      "num_patches": 17,
+      "debris_patches": 0,
+      "date": "14-11-18",
+      "utm_tile": "48PZC",
+      "coordinates": {
+        "lat": 12,
+        "lon": 105
+      }
+    },
+    "14-9-18_16PCC": {
+      "has_debris": true,
+      "confidence": 0.7241,
+      "num_patches": 44,
+      "debris_patches": 3,
+      "date": "14-9-18",
+      "utm_tile": "16PCC",
+      "coordinates": {
+        "lat": 12,
+        "lon": -87
+      }
+    },
+    "15-11-20_16PCC": {
+      "has_debris": false,
+      "confidence": 0.3798,
+      "num_patches": 24,
+      "debris_patches": 0,
+      "date": "15-11-20",
+      "utm_tile": "16PCC",
+      "coordinates": {
+        "lat": 12,
+        "lon": -87
+      }
+    },
+    "16-2-18_16PEC": {
+      "has_debris": true,
+      "confidence": 0.5946,
+      "num_patches": 29,
+      "debris_patches": 1,
+      "date": "16-2-18",
+      "utm_tile": "16PEC",
+      "coordinates": {
+        "lat": 12,
+        "lon": -87
+      }
+    },
+    "17-7-16_51PTS": {
+      "has_debris": false,
+      "confidence": 0.0816,
+      "num_patches": 2,
+      "debris_patches": 0,
+      "date": "17-7-16",
+      "utm_tile": "51PTS",
+      "coordinates": {
+        "lat": 12,
+        "lon": 123
+      }
+    },
+    "18-5-19_51PTS": {
+      "has_debris": false,
+      "confidence": 0.1824,
+      "num_patches": 4,
+      "debris_patches": 0,
+      "date": "18-5-19",
+      "utm_tile": "51PTS",
+      "coordinates": {
+        "lat": 12,
+        "lon": 123
+      }
+    },
+    "19-9-18_16PDC": {
+      "has_debris": true,
+      "confidence": 0.8371,
+      "num_patches": 26,
+      "debris_patches": 3,
+      "date": "19-9-18",
+      "utm_tile": "16PDC",
+      "coordinates": {
+        "lat": 12,
+        "lon": -87
+      }
+    },
+    "22-12-20_18QYF": {
+      "has_debris": false,
+      "confidence": 0.0085,
+      "num_patches": 2,
+      "debris_patches": 0,
+      "date": "22-12-20",
+      "utm_tile": "18QYF",
+      "coordinates": {
+        "lat": 20,
+        "lon": -75
+      }
+    },
+    "27-1-19_16PCC": {
+      "has_debris": true,
+      "confidence": 0.6811,
+      "num_patches": 31,
+      "debris_patches": 1,
+      "date": "27-1-19",
+      "utm_tile": "16PCC",
+      "coordinates": {
+        "lat": 12,
+        "lon": -87
+      }
+    },
+    "27-1-19_16QED": {
+      "has_debris": false,
+      "confidence": 0.2982,
+      "num_patches": 1,
+      "debris_patches": 0,
+      "date": "27-1-19",
+      "utm_tile": "16QED",
+      "coordinates": {
+        "lat": 20,
+        "lon": -87
+      }
+    }
+  },
+  "metadata": {
+    "generated_at": "2025-10-29T22:21:05.390648",
+    "total_locations": 11,
+    "locations_with_debris": 5,
+    "locations_without_debris": 6,
+    "debris_percentage": 45.45,
+    "total_patches": 208,
+    "patches_with_debris": 10
+  },
+  "samples": [
+    {
+      "index": 0,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0057
+    },
+    {
+      "index": 1,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0003
+    },
+    {
+      "index": 2,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.1379
+    },
+    {
+      "index": 3,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0157
+    },
+    {
+      "index": 4,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0052
+    },
+    {
+      "index": 5,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0007
+    },
+    {
+      "index": 6,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0632
+    },
+    {
+      "index": 7,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0024
+    },
+    {
+      "index": 8,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0001
+    },
+    {
+      "index": 9,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0723
+    },
+    {
+      "index": 10,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0134
+    },
+    {
+      "index": 11,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0269
+    },
+    {
+      "index": 12,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0095
+    },
+    {
+      "index": 13,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.1732
+    },
+    {
+      "index": 14,
+      "location": "12-12-20_16PCC",
+      "has_debris": true,
+      "confidence": 0.4951
+    },
+    {
+      "index": 15,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0114
+    },
+    {
+      "index": 16,
+      "location": "12-12-20_16PCC",
+      "has_debris": true,
+      "confidence": 0.7013
+    },
+    {
+      "index": 17,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.1296
+    },
+    {
+      "index": 18,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0002
+    },
+    {
+      "index": 19,
+      "location": "12-12-20_16PCC",
+      "has_debris": false,
+      "confidence": 0.0559
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 .env
 processed_patches
 data
+assets
 notes.txt
 extension.txt
 .venv
@@ -10,3 +11,7 @@ checkpoints
 *.h5
 evaluation_results
 MARIDA_models
+marinext
+format
+
+docs
