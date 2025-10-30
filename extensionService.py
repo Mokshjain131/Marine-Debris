@@ -121,24 +121,154 @@ def plan_debris_collection_route(grid, start_pos, budget):
         print("No viable route found within the given travel budget.")
         print(f"Consider increasing the budget of {budget}.")
 
+    import numpy as np
+from scipy.ndimage import label
+import math
+import matplotlib.pyplot as plt
+
+def plan_debris_collection_route(grid, start_pos, budget):
+    """
+    Analyzes a grid map to find an optimized debris collection route,
+    prints a report, and generates a visual plot of the path.
+    """
+    # Helper functions (get_direction, manhattan_distance) are unchanged
+    def get_direction(start_node_pos, first_stop_pos):
+        dy = first_stop_pos[0] - start_node_pos[0]
+        dx = first_stop_pos[1] - start_node_pos[1]
+        if dx == 0 and dy == 0: return "Stationary"
+        angle = math.degrees(math.atan2(-dy, dx))
+        if angle < 0: angle += 360
+        directions = {
+            "East": (0, 22.5), "North-East": (22.5, 67.5), "North": (67.5, 112.5),
+            "North-West": (112.5, 157.5), "West": (157.5, 202.5), "South-West": (202.5, 247.5),
+            "South": (247.5, 292.5), "South-East": (292.5, 337.5)
+        }
+        for direction, (lower, upper) in directions.items():
+            if lower <= angle < upper: return direction
+        return "East"
+
+    def manhattan_distance(p1, p2):
+        return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+    # --- Step 1: Preprocessing ---
+    grid_array = np.array(grid)
+    labeled_array, num_features = label(grid_array)
+    nodes = {0: {"pos": start_pos, "prize": 0, "id": 0}}
+    
+    for i in range(1, num_features + 1):
+        coords = np.argwhere(labeled_array == i)
+        if coords.size > 0:
+            center_pos = tuple(map(int, np.mean(coords, axis=0).round().astype(int)))
+            nodes[i] = {"pos": center_pos, "prize": len(coords), "id": i}
+
+    print(f"Analysis complete: Found {len(nodes)-1} debris clusters (nodes).")
+    for nid, data in nodes.items():
+        if nid > 0:
+            print(f"  - Node {nid}: Position={data['pos']}, Prize={data['prize']}")
+    print("-" * 30)
+
+    # --- Step 2: Algorithm ---
+    tour = [nodes[0], nodes[0]]
+    total_prize, total_distance = 0, 0
+    unvisited_node_ids = set(n for n in nodes if n != 0)
+    
+    while True:
+        best_insertion, best_score = None, -1
+        for node_id in unvisited_node_ids:
+            node_to_insert = nodes[node_id]
+            for i in range(len(tour) - 1):
+                prev_node, next_node = tour[i], tour[i+1]
+                cost_increase = (manhattan_distance(prev_node['pos'], node_to_insert['pos']) +
+                                 manhattan_distance(node_to_insert['pos'], next_node['pos']) -
+                                 manhattan_distance(prev_node['pos'], next_node['pos']))
+                if total_distance + cost_increase <= budget:
+                    score = node_to_insert['prize'] / (cost_increase + 1e-9)
+                    if score > best_score:
+                        best_score = score
+                        best_insertion = {"node": node_to_insert, "index": i + 1, "cost": cost_increase}
+        if best_insertion:
+            node = best_insertion['node']
+            tour.insert(best_insertion['index'], node)
+            total_distance += best_insertion['cost']
+            total_prize += node['prize']
+            unvisited_node_ids.remove(node['id'])
+        else:
+            break
+            
+    # --- Step 3: Text Output ---
+    print("MISSION PLAN:")
+    print("="*30)
+    
+    if len(tour) > 2:
+        start_node, first_destination_node = tour[0], tour[1]
+        initial_direction = get_direction(start_node['pos'], first_destination_node['pos'])
+        print(f"Initial Move: Head {initial_direction} towards Node {first_destination_node['id']} at {first_destination_node['pos']}.")
+        print(f"Optimal Path Found: {[node['id'] for node in tour]}")
+        print(f"Path Coordinates: {[node['pos'] for node in tour]}")
+        print(f"Total Prize Collected: {total_prize}")
+        print(f"Total Distance Traveled: {total_distance:.2f} (Budget was {budget})")
+    else:
+        print("No viable route found within the given travel budget.")
+        print(f"   Consider increasing the budget of {budget}.")
+
+    # --- Step 4: Visual Output ---
+    plt.figure(figsize=(8, 8))
+    plt.imshow(grid_array, cmap='Blues', interpolation='nearest', alpha=0.5)
+
+    all_node_coords = np.array([data['pos'] for data in nodes.values()])
+    plt.scatter(all_node_coords[:, 1], all_node_coords[:, 0], c='gray', s=100, label='Debris Clusters (All)')
+    plt.scatter(start_pos[1], start_pos[0], c='green', s=200, marker='*', label='Start/End Point')
+
+    if len(tour) > 2:
+        path_coords = np.array([node['pos'] for node in tour])
+        plt.plot(path_coords[:, 1], path_coords[:, 0], marker='o', color='red', linestyle='-', linewidth=2, markersize=8, label='Optimal Path')
+        for node in tour:
+            if node['id'] != 0:
+                plt.text(node['pos'][1] + 0.3, node['pos'][0], f"Node {node['id']}", fontsize=12, color='black')
+
+    plt.title('Mission Plan Visualization', fontsize=16)
+    plt.xlabel('X Coordinate (Column)')
+    plt.ylabel('Y Coordinate (Row)')
+    plt.legend()
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    
+    plt.gca().invert_yaxis()
+    plt.xlim(-0.5, grid_array.shape[1] - 0.5)
+    plt.ylim(grid_array.shape[0] - 0.5, -0.5)
+    plt.xticks(np.arange(grid_array.shape[1]))
+    plt.yticks(np.arange(grid_array.shape[0]))
+    
+    plt.show()
+
 # --- Main Execution ---
 if __name__ == '__main__':
     # Define the world grid, start position, and budget
     world_grid = [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0, 0, 0, 1, 1],
-        [0, 0, 0, 0, 1, 1, 0, 0, 1, 1],
-        [0, 0, 0, 0, 1, 1, 0, 0, 1, 0],
-        [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-        [0, 0, 0, 0, 0, 0, 0, 1, 1, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    ]
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0],
+    [0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0],
+    [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0],
+    [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0],
+    [1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0],
+    [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+]
+
     
     START_POS = (0, 0)
-    TRAVEL_BUDGET = 25
+    TRAVEL_BUDGET = 75
 
     # Call the main function to plan the route and print the report
     plan_debris_collection_route(world_grid, START_POS, TRAVEL_BUDGET)
